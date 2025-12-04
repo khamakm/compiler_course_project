@@ -17,8 +17,8 @@ if b_b EQ true then a ass a plus 1 else minus 1
 i integer
 for i ass 0 to 5 do write(i)
 while i LT 1 do i ass i minus 1
+=-
 end
-\0
 )";
     LexicalAnalyzer lAnalys(code);
     vector<Token> list_tokens = lAnalys.getAllToken();
