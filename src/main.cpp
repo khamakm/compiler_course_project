@@ -1,0 +1,28 @@
+#include <iostream>
+
+#include "../inc/LexicalAnalyzer.hpp"
+
+using namespace std;
+
+int main () {
+    string code = R"(abc ass 100
+a integer
+read(a)
+bca real
+bca ass 0.12
+b_b boolean
+b_b ass true
+{comment text}
+if b_b EQ true then a ass a plus 1 else minus 1
+i integer
+for i ass 0 to 5 do write(i)
+while i LT 1 do i ass i minus 1
+end
+\0
+)";
+    LexicalAnalyzer lAnalys(code);
+    vector<Token> list_tokens = lAnalys.getAllToken();
+    lAnalys.printAllToken(list_tokens);
+
+
+}
