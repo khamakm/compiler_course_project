@@ -30,8 +30,8 @@ using namespace std;
 #define FLOAT           "real"
 #define BOOL            "boolean"
 // comment
-#define COMMENT_OPEN    '('
-#define COMMENT_CLOSE   ')'
+#define COMMENT_OPEN    '{'
+#define COMMENT_CLOSE   '}'
 // ключевое слова конец программы
 #define END_PROGRAM     "end"
 #define END_PROGRAM_CHAR '\0'
@@ -46,7 +46,7 @@ using namespace std;
 #define WHILE_DO "do"
 // оператор ввода
 
-// Types of lixem
+// Типы ликсем
 enum TokenType {
     KEYWORD,
     IDENTIFIER,
@@ -57,9 +57,10 @@ enum TokenType {
     TERMINAL,
     END_OF_FILE,
     ERROR,
+    SERVICE
 };
 
-// Struct for keep lixems
+// Структура ликсемы
 struct Token {
     TokenType type;
     string value = "";
@@ -69,6 +70,7 @@ struct Token {
     Token() {}
     Token(TokenType t, string v, int l, int c)
         : type(t), value(v), line(l), column(c) {}
+    // Расшифровка типов ликсем
     string getTypeString() {
         if (type == 0) return "Ключевое слово";
         else if (type == 1) return "Идентификатор";
@@ -79,6 +81,7 @@ struct Token {
         else if (type == 6) return "Терминальный символ";
         else if (type == 7) return "Ключевое слово";
         else if (type == 8) return "Ошибка";
+        else return "Невозможное значение";
     }
 };
 
@@ -88,10 +91,10 @@ class LexicalAnalyzer {
         char current_char;
         int line;
         int column;
-        int position; // position in source_code
+        int position; // позиция символа в массиве исходного кода
 
-        // Table of keywords
-        unordered_map<string, TokenType> keywords = {
+        // Список ликсем и их типов
+        unordered_map<string, TokenType> lixems = {
             {INT, KEYWORD},
             {FLOAT, KEYWORD},
             {BOOL, KEYWORD},
@@ -111,11 +114,8 @@ class LexicalAnalyzer {
             {"writeln", KEYWORD},
             {TRUE, BOOL_CONSTANT},
             {FALSE, BOOL_CONSTANT},
-            {"dim", KEYWORD}
-        };
+            {"dim", KEYWORD},
 
-        // Таблица операторов
-        unordered_map<string, TokenType> operations = {
             {NOTEQUAL, OPERATOR},
             {EQUAL, OPERATOR},
             {LESS_THAN, OPERATOR},
@@ -131,26 +131,24 @@ class LexicalAnalyzer {
             {NOT, OPERATOR},
             {ASSIGNMENT, OPERATOR}
         };
-        
-        // Table of delititers
+
+        // Таблица терминальных символов
         unordered_map<char, TokenType> terminals = {
             {',', TERMINAL},
             {'(', TERMINAL},
-            {')', TERMINAL}
-            // {'\n', TERMINAL},
-            // {'\0', TERMINAL}
+            {')', TERMINAL},
+            {'\n', SERVICE},
+            {'\0', SERVICE},
+            {' ', SERVICE}
         };
 
     public:
-        // TODO раскидать в приват всё, что надо
-        // Input source_code and first char
         LexicalAnalyzer(string sc);
         void nextChar(int count);
         void skipComment();
         Token readNumber();
         Token readKeyword();
-        Token readTreminal();
-
+        
         Token getToken();
         vector<Token> getAllToken();
         void printAllToken(vector<Token> tokens);
