@@ -5,7 +5,7 @@
 using namespace std;
 
 int main () {
-    string code = R"(abc ass 100
+    string code = R"(b real %&6 5
 a integer
 read(a)
 bca real

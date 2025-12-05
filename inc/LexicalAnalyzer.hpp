@@ -1,50 +1,62 @@
 #pragma once
 
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
 using namespace std;
-// operations of group attitude
+// Операторы сравнения
 #define NOTEQUAL        "NE"
 #define EQUAL           "EQ"
 #define LESS_THAN       "LT"
 #define LESS_EQUAL      "LE"
 #define GREATER_THAN    "GT"
 #define GREATER_EQUAL   "GE"
-// operations of group addition
+// Операторы сложения
 #define PLUS            "plus"
 #define MINUS           "mun"
 #define OR              "or"
-// operations of group multiplication
+// Операвторы умножения
 #define MULT            "mult"
 #define DIV             "div"
 #define AND             "and"
-// unary operations
+// Унарный оператор
 #define NOT             "~"
-// assignment operator
+// Оператор присваивания
 #define ASSIGNMENT       "ass"
-// types
+// Типы данных
 #define INT             "integer"
 #define FLOAT           "real"
 #define BOOL            "boolean"
-// comment
+// Комментарий
 #define COMMENT_OPEN    '{'
 #define COMMENT_CLOSE   '}'
-// ключевое слова конец программы
+// ключевое слово конец программы
 #define END_PROGRAM     "end"
+// 
 #define END_PROGRAM_CHAR '\0'
+#define NEXT_LINE '\n'
 // булевая константа
 #define TRUE "true"
 #define FALSE "false"
+// оператор условия
+#define IF "if"
+#define IF_THEN "then"
+#define IF_ELSE "else"
 // оператор цикла
 #define FOR "for"
 #define FOR_TO "to"
 #define FOR_DO "do"
 #define WHILE "while"
 #define WHILE_DO "do"
-// оператор ввода
+// оператор ввода/вывода
+#define READ "read"
+#define WRITE "write"
+// оператор описания данных
+#define DIM "dim"
+
 
 // Типы ликсем
 enum TokenType {
@@ -98,23 +110,20 @@ class LexicalAnalyzer {
             {INT, KEYWORD},
             {FLOAT, KEYWORD},
             {BOOL, KEYWORD},
-            // {"begin", KEYWORD},
-            // {"end", KEYWORD},
             {END_PROGRAM, KEYWORD},
-            {"if", KEYWORD},
-            {"then", KEYWORD},
-            {"else", KEYWORD},
-            {"for", KEYWORD},
-            {"to", KEYWORD},
-            {"step", KEYWORD},
-            {"next", KEYWORD},
-            {"do", KEYWORD},
-            {"while", KEYWORD},
-            {"readln", KEYWORD},
-            {"writeln", KEYWORD},
+            {IF, KEYWORD},
+            {IF_THEN, KEYWORD},
+            {IF_ELSE, KEYWORD},
+            {FOR, KEYWORD},
+            {FOR_TO, KEYWORD},
+            {FOR_DO, KEYWORD},
+            {WHILE_DO, KEYWORD},
+            {WHILE, KEYWORD},
+            {READ, KEYWORD},
+            {WRITE, KEYWORD},
             {TRUE, BOOL_CONSTANT},
             {FALSE, BOOL_CONSTANT},
-            {"dim", KEYWORD},
+            {DIM, KEYWORD},
 
             {NOTEQUAL, OPERATOR},
             {EQUAL, OPERATOR},
@@ -142,14 +151,14 @@ class LexicalAnalyzer {
             {' ', SERVICE}
         };
 
-    public:
-        LexicalAnalyzer(string sc);
         void nextChar(int count);
         void skipComment();
         Token readNumber();
         Token readKeyword();
-        
         Token getToken();
+
+    public:
+        LexicalAnalyzer(string sc);
         vector<Token> getAllToken();
         void printAllToken(vector<Token> tokens);
 
