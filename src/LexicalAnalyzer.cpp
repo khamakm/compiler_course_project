@@ -1,4 +1,4 @@
-// TODO: обработка hex числа с первым символом не цифрой
+// TODO: if 'e' or 'E' and next is '+' or '-' and next num then порядок
 
 #include "../inc/LexicalAnalyzer.hpp"
 
@@ -48,7 +48,9 @@ bool LexicalAnalyzer::isOctCorrect(string num) {
 bool LexicalAnalyzer::isHexCorrect(string num) {
     if (!num.empty()) num.pop_back();
     for (char i : num) {
-        if (isdigit(i) && ('0' <= i && i <= '9') || ('A' <= i && i <= 'F') || ('a' <= i && i <= 'f')) continue;
+        if (isdigit(i) && ('0' <= i && i <= '9') 
+            || ('A' <= i && i <= 'F') || ('a' <= i && i <= 'f'))
+            continue;
         else return false;
     }
 
@@ -93,7 +95,6 @@ Token LexicalAnalyzer::readNumber() {
     else if (token.type == HEX_CONST) {
         if (!isHexCorrect(token.value)) token.type = ERROR;
     }
-        // if 'e' or 'E' and next is '+' or '-'
     return token;
 }
 

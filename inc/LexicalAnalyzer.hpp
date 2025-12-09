@@ -168,5 +168,4 @@ class LexicalAnalyzer {
         LexicalAnalyzer(string sc);
         vector<Token> getAllToken();
         void printAllToken(vector<Token> tokens);
-
 };
