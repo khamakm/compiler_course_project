@@ -62,9 +62,11 @@ using namespace std;
 enum TokenType {
     KEYWORD,
     IDENTIFIER,
-    INT_CONSTANT,
-    FLOAT_CONSTANT,
-    BOOL_CONSTANT,
+    INT_CONST,
+    FLOAT_CONST,
+    BOOL_CONST,
+    OCT_CONST,
+    HEX_CONST,
     OPERATOR,
     TERMINAL,
     END_OF_FILE,
@@ -89,10 +91,13 @@ struct Token {
         else if (type == 2) return "Целочисленная константа";
         else if (type == 3) return "Константа с плавающей точкой";
         else if (type == 4) return "Булевая константа";
-        else if (type == 5) return "Оператор";
-        else if (type == 6) return "Терминальный символ";
-        else if (type == 7) return "Ключевое слово";
-        else if (type == 8) return "Ошибка";
+        else if (type == 5) return "Восьмеричная константа";
+        else if (type == 6) return "Шестнадцатиричная константа";
+        else if (type == 7) return "Оператор";
+        else if (type == 8) return "Терминальный символ";
+        else if (type == 9) return "Ключевое слово";
+        else if (type == 10) return "Ошибка";
+        else if (type == 11) return "Служебный символ";
         else return "Невозможное значение";
     }
 };
@@ -121,8 +126,8 @@ class LexicalAnalyzer {
             {WHILE, KEYWORD},
             {READ, KEYWORD},
             {WRITE, KEYWORD},
-            {TRUE, BOOL_CONSTANT},
-            {FALSE, BOOL_CONSTANT},
+            {TRUE, BOOL_CONST},
+            {FALSE, BOOL_CONST},
             {DIM, KEYWORD},
 
             {NOTEQUAL, OPERATOR},
@@ -153,6 +158,8 @@ class LexicalAnalyzer {
 
         void nextChar(int count);
         void skipComment();
+        bool isOctCorrect(string num);
+        bool isHexCorrect(string num);
         Token readNumber();
         Token readKeyword();
         Token getToken();
