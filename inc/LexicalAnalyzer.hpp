@@ -35,28 +35,35 @@ using namespace std;
 #define COMMENT_CLOSE   '}'
 // ключевое слово конец программы
 #define END_PROGRAM     "end"
-// 
+//  Служебные символы
 #define END_PROGRAM_CHAR '\0'
-#define NEXT_LINE '\n'
+#define NEXT_LINE       '\n'
+#define FLOAT_DELIMITER '.'
+// 8, 10 и 16-ричные маркеры числа
+#define OCT_HIGHT       'O'
+#define OCT_LOW         'o'
+#define DEC_HIGHT       'D'
+#define DEC_LOW         'd'
+#define HEX_HIGHT       'H'
+#define HEX_LOW         'h'
 // булевая константа
-#define TRUE "true"
-#define FALSE "false"
+#define TRUE            "true"
+#define FALSE           "false"
 // оператор условия
-#define IF "if"
-#define IF_THEN "then"
-#define IF_ELSE "else"
+#define IF              "if"
+#define IF_THEN         "then"
+#define IF_ELSE         "else"
 // оператор цикла
-#define FOR "for"
-#define FOR_TO "to"
-#define FOR_DO "do"
-#define WHILE "while"
-#define WHILE_DO "do"
+#define FOR             "for"
+#define FOR_TO          "to"
+#define FOR_DO          "do"
+#define WHILE           "while"
+#define WHILE_DO        "do"
 // оператор ввода/вывода
-#define READ "read"
-#define WRITE "write"
+#define READ            "read"
+#define WRITE           "write"
 // оператор описания данных
-#define DIM "dim"
-
+#define DIM             "dim"
 
 // Типы ликсем
 enum TokenType {

@@ -46,6 +46,9 @@ bool LexicalAnalyzer::isOctCorrect(string num) {
 
 // Проверка корректности записи Шестнадцатиричного числа
 bool LexicalAnalyzer::isHexCorrect(string num) {
+    auto test1 = num.back();
+    if ((test1 != HEX_LOW) && (test1 != HEX_HIGHT)) 
+        return false;
     if (!num.empty()) num.pop_back();
     for (char i : num) {
         if (isdigit(i) && ('0' <= i && i <= '9') 
@@ -68,27 +71,23 @@ Token LexicalAnalyzer::readNumber() {
     while (terminals.find(current_char) == terminals.end()) {
         token.value += current_char;
 
+        // Определение разделителя вещественного числа
         if (isdigit(current_char)) {
-            if (source_code[position + 1] == '.') {
+            if (source_code[position + 1] == FLOAT_DELIMITER) {
                 token.type = FLOAT_CONST;
             }
         } // Восьмеричное число
-        else if (current_char == 'o' || current_char == 'O') {
-            token.type = OCT_CONST;
-        } // Десятичное число
-        else if (current_char == 'd' || current_char == 'D') {
-            token.type = INT_CONST;
-        } // Шестнадцатиричное число
-        else if (current_char == 'h' || current_char == 'H') {
-            token.type = HEX_CONST;
-        }
-        else {
-            token.type = ERROR;
-        }
+        else if (current_char == OCT_LOW || current_char == OCT_HIGHT) token.type = OCT_CONST;
+        // Десятичное число
+        else if (current_char == DEC_LOW || current_char == DEC_HIGHT) token.type = INT_CONST;
+        // Шестнадцатиричное число
+        else if (current_char == HEX_LOW || current_char == HEX_HIGHT) token.type = HEX_CONST;
+        else token.type = ERROR;
 
         nextChar(1);
     }
 
+    // Проверка корректности записи числа
     if (token.type == OCT_CONST) {
         if (!isOctCorrect(token.value)) token.type = ERROR;
     }
@@ -100,19 +99,18 @@ Token LexicalAnalyzer::readNumber() {
 
 // Возврат типа ликсемы 
 Token LexicalAnalyzer::readKeyword() {
-    string word = "";
     Token token;
+    token.value = "";
     token.line = line;
     token.column = column;
     
     // Пока текущий символ не терминальный или не оператор сбор слова
     while (terminals.find(current_char) == terminals.end()) {
-        word += current_char;
+        token.value += current_char;
         nextChar(1);
     }
-    token.value = word;
 
-    auto lixem = lixems.find(word);
+    auto lixem = lixems.find(token.value);
     // Если слово есть в списке ликсем, то возврат ликсемы
     if (lixem != lixems.end()) {
         if (lixem->first == END_PROGRAM)
@@ -121,7 +119,8 @@ Token LexicalAnalyzer::readKeyword() {
         return token;
     }
     else {
-        token.type = IDENTIFIER;
+        if (isHexCorrect(token.value)) token.type = HEX_CONST;
+        else token.type = IDENTIFIER;
         return token;
     }
 }
