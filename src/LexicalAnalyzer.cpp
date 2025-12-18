@@ -1,5 +1,3 @@
-// TODO: if 'e' or 'E' and next is '+' or '-' and next num then порядок
-
 #include "../inc/LexicalAnalyzer.hpp"
 
 // Инициализация лексического анализатора: загрузка исходного кода и первого символа
@@ -75,6 +73,8 @@ Token LexicalAnalyzer::readNumber() {
         if (isdigit(current_char)) {
             if (source_code[position + 1] == FLOAT_DELIMITER) {
                 token.type = FLOAT_CONST;
+                token.value += '.';
+                nextChar(1);
             }
         } // Восьмеричное число
         else if (current_char == OCT_LOW || current_char == OCT_HIGHT) token.type = OCT_CONST;
@@ -129,8 +129,21 @@ Token LexicalAnalyzer::getToken() {
     // Пропуск пробелов и комментариев, обработка терминальных символов
     Token token;
     while (current_char != END_PROGRAM_CHAR) {
-        if (current_char == ' ') nextChar(1);
-        else if (current_char == COMMENT_OPEN) skipComment();
+        if (current_char == ' ') {
+            nextChar(1);
+        }
+        else if (current_char == COMMENT_OPEN) {
+            skipComment();
+        }
+        else if (current_char == '\n') {
+            // Возвращаем токен перевода строки
+            token.value = "\n";
+            token.type = SERVICE;
+            token.line = line;
+            token.column = column;
+            nextChar(1);
+            return token;
+        }
         else {
             auto terminal_token = terminals.find(current_char);
             if (terminal_token != terminals.end()) {
@@ -142,7 +155,6 @@ Token LexicalAnalyzer::getToken() {
                     token.type = terminal_token->second;
                     return token;
                 }
-
             }
             else break;
         }
@@ -175,8 +187,14 @@ vector<Token> LexicalAnalyzer::getAllToken() {
 
     do {
         token = getToken();
-        table_id.push_back(token);
+        // Добавляем токен только если это не служебный символ (кроме перевода строки)
+        if (token.type != SERVICE || token.value == "\n") {
+            table_id.push_back(token);
+        }
     } while (current_char != END_PROGRAM_CHAR); 
+    
+    // Добавляем конец файла
+    table_id.push_back(Token(END_OF_FILE, "", line, column));
     return table_id;
 }
 

@@ -1,28 +1,37 @@
 #include <iostream>
-
 #include "../inc/LexicalAnalyzer.hpp"
+#include "../inc/SyntacticAnalyzer.hpp"
 
 using namespace std;
-
-int main () {
-    string code = R"(5y 15o 8O 2fH 1Gh 11d 10D H8h abh
-a integer
-read(a)
-bca real
-bca ass 0.12
-b_b boolean
-b_b ass true
-{comment text}
-if b_b EQ true then a ass a plus 1 else minus 1
-i integer
-for i ass 0 to 5 do write(i)
-while i LT 1 do i ass i minus 1
-=-
-end
-)";
+int main() {
+    string code = R"(if b_b EQ true then a ass a plus 1 else minus 1
+    read(a)
+    {comment text}
+    for i ass 0 to 5 do write(i)
+    while i LT 1 do i ass i minus 1
+    dim i, abc integer
+    b_b ass true
+    end)";
+// 0.12 2.0
+// 15o 2fH 11d 10D H8h abh a8h
+// a integer
+// read(a)
+// bca real
+// bca ass 0.12
+// b_b boolean
+// b_b ass true
+// {comment text}
+// if b_b EQ true then a ass a plus 1 else minus 1
+// i integer
+// for i ass 0 to 5 do write(i)
+// while i LT 1 do i ass i minus 1
+// end
+// )";
     LexicalAnalyzer lAnalys(code);
     vector<Token> list_tokens = lAnalys.getAllToken();
     lAnalys.printAllToken(list_tokens);
 
-
+    SyntacticAnalyzer parser(list_tokens);
+    parser.analyze();
+    parser.printResult();
 }

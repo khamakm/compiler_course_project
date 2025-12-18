@@ -16,7 +16,7 @@ using namespace std;
 #define GREATER_EQUAL   "GE"
 // Операторы сложения
 #define PLUS            "plus"
-#define MINUS           "mun"
+#define MINUS           "min"
 #define OR              "or"
 // Операвторы умножения
 #define MULT            "mult"
