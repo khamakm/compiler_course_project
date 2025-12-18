@@ -4,7 +4,7 @@
 
 using namespace std;
 int main() {
-    string code = R"(if b_b EQ true then a ass a plus 1 else minus 1
+    string code = R"(if ~b_b EQ true then a ass a mult 1 else minus 1
     read(a)
     {comment text}
     for i ass 0 to 5 do write(i)

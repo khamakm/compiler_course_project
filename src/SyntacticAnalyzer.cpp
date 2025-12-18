@@ -109,6 +109,7 @@ void SyntacticAnalyzer::booleanConstant() {
  * @brief P21: <число>::= <целое> | <действительное>
  */
 void SyntacticAnalyzer::number() {
+    usedRules.push_back("P21"); // ДОБАВЛЕНО ПРАВИЛО P21
     debugPrint("[DEBUG] number() called, current token: " + current_token.value);
     
     if (current_token.type == INT_CONST || current_token.type == FLOAT_CONST ||
@@ -129,6 +130,7 @@ void SyntacticAnalyzer::number() {
  * @brief P20: <унарная_операция>::='~'
  */
 void SyntacticAnalyzer::unaryOperation() {
+    usedRules.push_back("P20"); // ДОБАВЛЕНО ПРАВИЛО P20
     debugPrint("[DEBUG] unaryOperation() called, current token: " + current_token.value);
     
     if (current_token.value == "~") {
@@ -149,6 +151,7 @@ void SyntacticAnalyzer::unaryOperation() {
  *           <унарная_операция> <множитель> | (<выражение>)
  */
 void SyntacticAnalyzer::factor() {
+    usedRules.push_back("P19"); // ДОБАВЛЕНО ПРАВИЛО P19
     debugPrint("[DEBUG] factor() called, current token: " + current_token.value);
     
     // Унарная операция
@@ -169,21 +172,20 @@ void SyntacticAnalyzer::factor() {
             errorColumn = current_token.column;
         }
     }
-    // Идентификатор
+    // Идентификатор (P23)
     else if (current_token.type == IDENTIFIER) {
+        usedRules.push_back("P23"); // ДОБАВЛЕНО ПРАВИЛО P23
         debugPrint("[DEBUG] Consuming identifier: " + current_token.value);
         consumeToken();
     }
-    // Число
+    // Число (P21)
     else if (current_token.type == INT_CONST || current_token.type == FLOAT_CONST ||
              current_token.type == OCT_CONST || current_token.type == HEX_CONST) {
-        debugPrint("[DEBUG] Consuming number: " + current_token.value);
-        consumeToken();
+        number(); // Вызываем number() вместо consumeToken()
     }
-    // Логическая константа
+    // Логическая константа (P22)
     else if (current_token.value == "true" || current_token.value == "false") {
-        debugPrint("[DEBUG] Consuming boolean constant: " + current_token.value);
-        consumeToken();
+        booleanConstant(); // Вызываем booleanConstant() вместо consumeToken()
     }
     // Ошибка
     else {
@@ -201,14 +203,16 @@ void SyntacticAnalyzer::factor() {
  * @brief P18: <слагаемое>::= <множитель> {<операции_группы_умножения> <множитель>}
  */
 void SyntacticAnalyzer::term() {
+    usedRules.push_back("P18"); // ДОБАВЛЕНО ПРАВИЛО P18
     debugPrint("[DEBUG] term() called, current token: " + current_token.value);
     
     factor();
     
     if (hasError) return;
     
-    // Обработка операторов умножения
+    // Обработка операторов умножения (P3)
     while (isMultiplicativeOperator()) {
+        usedRules.push_back("P3"); // ДОБАВЛЕНО ПРАВИЛО P3
         string op = current_token.value;
         debugPrint("[DEBUG] Found multiplicative operator: " + op);
         consumeToken();
@@ -224,14 +228,16 @@ void SyntacticAnalyzer::term() {
  * @brief P17: <операнд>::= <слагаемое> {<операции_группы_сложения> <слагаемое>}
  */
 void SyntacticAnalyzer::operand() {
+    usedRules.push_back("P17"); // ДОБАВЛЕНО ПРАВИЛО P17
     debugPrint("[DEBUG] operand() called, current token: " + current_token.value);
     
     term();
     
     if (hasError) return;
     
-    // Обработка операторов сложения
+    // Обработка операторов сложения (P2)
     while (isAdditiveOperator()) {
+        usedRules.push_back("P2"); // ДОБАВЛЕНО ПРАВИЛО P2
         string op = current_token.value;
         debugPrint("[DEBUG] Found additive operator: " + op);
         consumeToken();
@@ -256,8 +262,9 @@ void SyntacticAnalyzer::expression() {
     
     if (hasError) return;
     
-    // Обработка операторов отношения
+    // Обработка операторов отношения (P1)
     while (isRelationalOperator()) {
+        usedRules.push_back("P1"); // ДОБАВЛЕНО ПРАВИЛО P1
         string op = current_token.value;
         debugPrint("[DEBUG] Found relational operator: " + op);
         consumeToken();
@@ -586,7 +593,13 @@ void SyntacticAnalyzer::writeStatement() {
  * P27: Однострочные комментарии - '{' {<любой символ>} '}'
  */
 void SyntacticAnalyzer::comment() {
-    usedRules.push_back("P15");
+    // Используем P27 для однострочных комментариев, P15 для многострочных
+    if (current_token.value == "(*") {
+        usedRules.push_back("P15");
+    } else if (current_token.value == "{") {
+        usedRules.push_back("P27");
+    }
+    
     debugPrint("[DEBUG] comment() called, current token: " + current_token.value);
     
     if (current_token.value == "(*") {
@@ -636,7 +649,7 @@ void SyntacticAnalyzer::comment() {
  * P8: Синтаксис составного оператора
  */
 void SyntacticAnalyzer::statement() {
-    usedRules.push_back("P8");
+    usedRules.push_back("P26");
     string message = "[DEBUG] statement() called, current token: " + current_token.value +
                      " (type: " + current_token.getTypeString() + ")";
     debugPrint(message);
@@ -701,9 +714,10 @@ void SyntacticAnalyzer::program() {
     
     // Обработка последовательности описаний и операторов
     while (current_token.type != END_OF_FILE && current_token.value != "end") {
-        // Пропускаем переводы строк между операторами
-        while (matchTokenValue("\n")) {
-            debugPrint("[DEBUG] Skipping newline");
+        // Пропускаем переводы строк между операторов (часть P8)
+        if (matchTokenValue("\n")) {
+            usedRules.push_back("P8");
+            debugPrint("[DEBUG] Skipping newline (P8)");
         }
         
         // Если после пропуска переводов строк мы нашли 'end', выходим
@@ -718,9 +732,11 @@ void SyntacticAnalyzer::program() {
             return;
         }
         
-        // Пропускаем возможные переводы строк после оператора
-        while (matchTokenValue("\n")) {
-            debugPrint("[DEBUG] Skipping newline after statement");
+        // Пропускаем возможные переводы строк после оператора (часть P8)
+        if (current_token.value == "\n") {
+            usedRules.push_back("P8");
+            debugPrint("[DEBUG] Skipping newline after statement (P8)");
+            matchTokenValue("\n");
         }
         
         // Проверяем, не конец ли программы
@@ -779,9 +795,17 @@ void SyntacticAnalyzer::printResult() {
     cout << "=========================================" << endl;
     cout << "Сработавшие правила:" << endl;
     
-    for (size_t i = 0; i < usedRules.size(); ++i) {
+    // Удаляем дубликаты правил для более чистого вывода
+    vector<string> uniqueRules;
+    for (const string& rule : usedRules) {
+        if (uniqueRules.empty() || uniqueRules.back() != rule) {
+            uniqueRules.push_back(rule);
+        }
+    }
+    
+    for (size_t i = 0; i < uniqueRules.size(); ++i) {
         if (i > 0) cout << "->";
-        cout << usedRules[i];
+        cout << uniqueRules[i];
     }
     cout << endl;
     
