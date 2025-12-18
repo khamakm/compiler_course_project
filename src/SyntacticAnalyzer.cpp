@@ -1,12 +1,22 @@
 #include "../inc/SyntacticAnalyzer.hpp"
 #include <iostream>
 
+// Инициализация статической переменной
+bool SyntacticAnalyzer::debugMode = false;
+
 SyntacticAnalyzer::SyntacticAnalyzer(const vector<Token>& tokenList) 
     : tokens(tokenList), currentPos(0), hasError(false) {
     if (!tokens.empty()) {
         current_token = tokens[0];
     } else {
         current_token = Token(END_OF_FILE, "", 0, 0);
+    }
+}
+
+// Метод для отладочного вывода
+void SyntacticAnalyzer::debugPrint(const string& message) {
+    if (debugMode) {
+        cout << message << endl;
     }
 }
 
@@ -70,8 +80,7 @@ bool SyntacticAnalyzer::isAdditiveOperator() {
 }
 
 bool SyntacticAnalyzer::isMultiplicativeOperator() {
-    // Изменено с "mult" на "mul" согласно P3
-    return current_token.value == "mul" || current_token.value == "div" || 
+    return current_token.value == "mult" || current_token.value == "div" || 
            current_token.value == "and";
 }
 
@@ -81,10 +90,10 @@ bool SyntacticAnalyzer::isMultiplicativeOperator() {
  * @brief P22: <логическая_константа>::= true | false
  */
 void SyntacticAnalyzer::booleanConstant() {
-    cout << "[DEBUG] booleanConstant() called, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] booleanConstant() called, current token: " + current_token.value);
     
     if (current_token.value == "true" || current_token.value == "false") {
-        cout << "[DEBUG] Consuming boolean constant: " << current_token.value << endl;
+        debugPrint("[DEBUG] Consuming boolean constant: " + current_token.value);
         consumeToken();
     } else {
         hasError = true;
@@ -93,18 +102,18 @@ void SyntacticAnalyzer::booleanConstant() {
         errorColumn = current_token.column;
     }
     
-    cout << "[DEBUG] booleanConstant() completed, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] booleanConstant() completed, current token: " + current_token.value);
 }
 
 /**
  * @brief P21: <число>::= <целое> | <действительное>
  */
 void SyntacticAnalyzer::number() {
-    cout << "[DEBUG] number() called, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] number() called, current token: " + current_token.value);
     
     if (current_token.type == INT_CONST || current_token.type == FLOAT_CONST ||
         current_token.type == OCT_CONST || current_token.type == HEX_CONST) {
-        cout << "[DEBUG] Consuming number: " << current_token.value << endl;
+        debugPrint("[DEBUG] Consuming number: " + current_token.value);
         consumeToken();
     } else {
         hasError = true;
@@ -113,17 +122,17 @@ void SyntacticAnalyzer::number() {
         errorColumn = current_token.column;
     }
     
-    cout << "[DEBUG] number() completed, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] number() completed, current token: " + current_token.value);
 }
 
 /**
  * @brief P20: <унарная_операция>::='~'
  */
 void SyntacticAnalyzer::unaryOperation() {
-    cout << "[DEBUG] unaryOperation() called, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] unaryOperation() called, current token: " + current_token.value);
     
     if (current_token.value == "~") {
-        cout << "[DEBUG] Found unary operator: ~" << endl;
+        debugPrint("[DEBUG] Found unary operator: ~");
         consumeToken();
     } else {
         hasError = true;
@@ -132,7 +141,7 @@ void SyntacticAnalyzer::unaryOperation() {
         errorColumn = current_token.column;
     }
     
-    cout << "[DEBUG] unaryOperation() completed, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] unaryOperation() completed, current token: " + current_token.value);
 }
 
 /**
@@ -140,17 +149,17 @@ void SyntacticAnalyzer::unaryOperation() {
  *           <унарная_операция> <множитель> | (<выражение>)
  */
 void SyntacticAnalyzer::factor() {
-    cout << "[DEBUG] factor() called, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] factor() called, current token: " + current_token.value);
     
     // Унарная операция
     if (current_token.value == "~") {
-        cout << "[DEBUG] Processing unary operation" << endl;
+        debugPrint("[DEBUG] Processing unary operation");
         unaryOperation();
         factor();
     }
     // Выражение в скобках
     else if (current_token.value == "(") {
-        cout << "[DEBUG] Found '(' starting parenthesized expression" << endl;
+        debugPrint("[DEBUG] Found '(' starting parenthesized expression");
         consumeToken();
         expression();
         if (!matchTokenValue(")")) {
@@ -162,18 +171,18 @@ void SyntacticAnalyzer::factor() {
     }
     // Идентификатор
     else if (current_token.type == IDENTIFIER) {
-        cout << "[DEBUG] Consuming identifier: " << current_token.value << endl;
+        debugPrint("[DEBUG] Consuming identifier: " + current_token.value);
         consumeToken();
     }
     // Число
     else if (current_token.type == INT_CONST || current_token.type == FLOAT_CONST ||
              current_token.type == OCT_CONST || current_token.type == HEX_CONST) {
-        cout << "[DEBUG] Consuming number: " << current_token.value << endl;
+        debugPrint("[DEBUG] Consuming number: " + current_token.value);
         consumeToken();
     }
     // Логическая константа
     else if (current_token.value == "true" || current_token.value == "false") {
-        cout << "[DEBUG] Consuming boolean constant: " << current_token.value << endl;
+        debugPrint("[DEBUG] Consuming boolean constant: " + current_token.value);
         consumeToken();
     }
     // Ошибка
@@ -182,17 +191,17 @@ void SyntacticAnalyzer::factor() {
         errorMessage = "Ожидается множитель (идентификатор, число, логическая константа или '(')";
         errorLine = current_token.line;
         errorColumn = current_token.column;
-        cout << "[DEBUG] Error in factor(): " << errorMessage << endl;
+        debugPrint("[DEBUG] Error in factor(): " + errorMessage);
     }
     
-    cout << "[DEBUG] factor() completed, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] factor() completed, current token: " + current_token.value);
 }
 
 /**
  * @brief P18: <слагаемое>::= <множитель> {<операции_группы_умножения> <множитель>}
  */
 void SyntacticAnalyzer::term() {
-    cout << "[DEBUG] term() called, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] term() called, current token: " + current_token.value);
     
     factor();
     
@@ -201,21 +210,21 @@ void SyntacticAnalyzer::term() {
     // Обработка операторов умножения
     while (isMultiplicativeOperator()) {
         string op = current_token.value;
-        cout << "[DEBUG] Found multiplicative operator: " << op << endl;
+        debugPrint("[DEBUG] Found multiplicative operator: " + op);
         consumeToken();
         factor();
         
         if (hasError) return;
     }
     
-    cout << "[DEBUG] term() completed, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] term() completed, current token: " + current_token.value);
 }
 
 /**
  * @brief P17: <операнд>::= <слагаемое> {<операции_группы_сложения> <слагаемое>}
  */
 void SyntacticAnalyzer::operand() {
-    cout << "[DEBUG] operand() called, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] operand() called, current token: " + current_token.value);
     
     term();
     
@@ -224,22 +233,23 @@ void SyntacticAnalyzer::operand() {
     // Обработка операторов сложения
     while (isAdditiveOperator()) {
         string op = current_token.value;
-        cout << "[DEBUG] Found additive operator: " << op << endl;
+        debugPrint("[DEBUG] Found additive operator: " + op);
         consumeToken();
         term();
         
         if (hasError) return;
     }
     
-    cout << "[DEBUG] operand() completed, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] operand() completed, current token: " + current_token.value);
 }
 
 /**
  * @brief P16: <выражение>::= <операнд>{<операции_группы_отношения> <операнд>}
  */
 void SyntacticAnalyzer::expression() {
-    cout << "[DEBUG] expression() called, current token: " << current_token.value 
-         << " (line: " << current_token.line << ")" << endl;
+    string message = "[DEBUG] expression() called, current token: " + current_token.value +
+                     " (line: " + to_string(current_token.line) + ")";
+    debugPrint(message);
     usedRules.push_back("P16");
     
     operand();
@@ -249,14 +259,14 @@ void SyntacticAnalyzer::expression() {
     // Обработка операторов отношения
     while (isRelationalOperator()) {
         string op = current_token.value;
-        cout << "[DEBUG] Found relational operator: " << op << endl;
+        debugPrint("[DEBUG] Found relational operator: " + op);
         consumeToken();
         operand();
         
         if (hasError) return;
     }
     
-    cout << "[DEBUG] expression() completed, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] expression() completed, current token: " + current_token.value);
 }
 
 // === Основные правила грамматики ===
@@ -266,7 +276,7 @@ void SyntacticAnalyzer::expression() {
  */
 void SyntacticAnalyzer::description() {
     usedRules.push_back("P6");
-    cout << "[DEBUG] description() called, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] description() called, current token: " + current_token.value);
     
     if (!matchTokenValue("dim")) {
         hasError = true;
@@ -305,7 +315,7 @@ void SyntacticAnalyzer::description() {
         errorColumn = current_token.column;
     }
     
-    cout << "[DEBUG] description() completed, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] description() completed, current token: " + current_token.value);
 }
 
 /**
@@ -313,7 +323,7 @@ void SyntacticAnalyzer::description() {
  */
 void SyntacticAnalyzer::assignment() {
     usedRules.push_back("P9");
-    cout << "[DEBUG] assignment() called, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] assignment() called, current token: " + current_token.value);
     
     // Сохраняем идентификатор
     string identifier = current_token.value;
@@ -326,7 +336,7 @@ void SyntacticAnalyzer::assignment() {
         return;
     }
     
-    cout << "[DEBUG] Consumed identifier: " << identifier << endl;
+    debugPrint("[DEBUG] Consumed identifier: " + identifier);
     
     if (!matchTokenValue("ass")) {
         hasError = true;
@@ -336,12 +346,12 @@ void SyntacticAnalyzer::assignment() {
         return;
     }
     
-    cout << "[DEBUG] Consumed 'ass', now parsing expression" << endl;
+    debugPrint("[DEBUG] Consumed 'ass', now parsing expression");
     
     // Правая часть присваивания - выражение (P16)
     expression();
     
-    cout << "[DEBUG] assignment() completed, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] assignment() completed, current token: " + current_token.value);
 }
 
 /**
@@ -349,7 +359,7 @@ void SyntacticAnalyzer::assignment() {
  */
 void SyntacticAnalyzer::conditional() {
     usedRules.push_back("P10");
-    cout << "[DEBUG] conditional() called, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] conditional() called, current token: " + current_token.value);
     
     if (!matchTokenValue("if")) {
         hasError = true;
@@ -370,18 +380,18 @@ void SyntacticAnalyzer::conditional() {
         return;
     }
     
-    cout << "[DEBUG] Before then-block statement(), current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] Before then-block statement(), current token: " + current_token.value);
     
     // Блок then
     statement();
     
     // Необязательный блок else
     if (matchTokenValue("else")) {
-        cout << "[DEBUG] Found 'else', processing else-block" << endl;
+        debugPrint("[DEBUG] Found 'else', processing else-block");
         statement();
     }
     
-    cout << "[DEBUG] conditional() completed, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] conditional() completed, current token: " + current_token.value);
 }
 
 /**
@@ -389,7 +399,7 @@ void SyntacticAnalyzer::conditional() {
  */
 void SyntacticAnalyzer::forLoop() {
     usedRules.push_back("P11");
-    cout << "[DEBUG] forLoop() called, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] forLoop() called, current token: " + current_token.value);
     
     if (!matchTokenValue("for")) {
         hasError = true;
@@ -425,7 +435,7 @@ void SyntacticAnalyzer::forLoop() {
     // Тело цикла
     statement();
     
-    cout << "[DEBUG] forLoop() completed, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] forLoop() completed, current token: " + current_token.value);
 }
 
 /**
@@ -433,7 +443,7 @@ void SyntacticAnalyzer::forLoop() {
  */
 void SyntacticAnalyzer::whileLoop() {
     usedRules.push_back("P12");
-    cout << "[DEBUG] whileLoop() called, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] whileLoop() called, current token: " + current_token.value);
     
     if (!matchTokenValue("while")) {
         hasError = true;
@@ -457,7 +467,7 @@ void SyntacticAnalyzer::whileLoop() {
     // Тело цикла
     statement();
     
-    cout << "[DEBUG] whileLoop() completed, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] whileLoop() completed, current token: " + current_token.value);
 }
 
 /**
@@ -465,7 +475,7 @@ void SyntacticAnalyzer::whileLoop() {
  */
 void SyntacticAnalyzer::readStatement() {
     usedRules.push_back("P13");
-    cout << "[DEBUG] readStatement() called, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] readStatement() called, current token: " + current_token.value);
     
     // Сохраняем координаты для сообщений об ошибках
     int line = current_token.line;
@@ -517,7 +527,7 @@ void SyntacticAnalyzer::readStatement() {
         return;
     }
     
-    cout << "[DEBUG] readStatement() completed, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] readStatement() completed, current token: " + current_token.value);
 }
 
 /**
@@ -525,7 +535,7 @@ void SyntacticAnalyzer::readStatement() {
  */
 void SyntacticAnalyzer::writeStatement() {
     usedRules.push_back("P14");
-    cout << "[DEBUG] writeStatement() called, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] writeStatement() called, current token: " + current_token.value);
     
     // Сохраняем координаты для сообщений об ошибках
     int line = current_token.line;
@@ -568,7 +578,7 @@ void SyntacticAnalyzer::writeStatement() {
         return;
     }
     
-    cout << "[DEBUG] writeStatement() completed, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] writeStatement() completed, current token: " + current_token.value);
 }
 
 /**
@@ -577,7 +587,7 @@ void SyntacticAnalyzer::writeStatement() {
  */
 void SyntacticAnalyzer::comment() {
     usedRules.push_back("P15");
-    cout << "[DEBUG] comment() called, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] comment() called, current token: " + current_token.value);
     
     if (current_token.value == "(*") {
         // Многострочный комментарий
@@ -617,7 +627,7 @@ void SyntacticAnalyzer::comment() {
         return;
     }
     
-    cout << "[DEBUG] comment() completed, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] comment() completed, current token: " + current_token.value);
 }
 
 /**
@@ -627,55 +637,59 @@ void SyntacticAnalyzer::comment() {
  */
 void SyntacticAnalyzer::statement() {
     usedRules.push_back("P8");
-    cout << "[DEBUG] statement() called, current token: " << current_token.value 
-         << " (type: " << current_token.getTypeString() << ")" << endl;
+    string message = "[DEBUG] statement() called, current token: " + current_token.value +
+                     " (type: " + current_token.getTypeString() + ")";
+    debugPrint(message);
     
     // Проверяем следующий токен (смещение 1)
     Token nextToken = peekNextToken(1);
-    cout << "[DEBUG] Next token (peek 1): " << nextToken.value 
-         << " (type: " << nextToken.getTypeString() << ")" << endl;
+    message = "[DEBUG] Next token (peek 1): " + nextToken.value +
+              " (type: " + nextToken.getTypeString() + ")";
+    debugPrint(message);
     
     if (current_token.value == "dim") {
-        cout << "[DEBUG] Found 'dim', calling description()" << endl;
+        debugPrint("[DEBUG] Found 'dim', calling description()");
         description();
     } 
     // Проверяем оператор присваивания: идентификатор + 'ass'
     else if (current_token.type == IDENTIFIER && nextToken.value == "ass") {
-        cout << "[DEBUG] Found assignment pattern: " << current_token.value 
-             << " + " << nextToken.value << ", calling assignment()" << endl;
+        message = "[DEBUG] Found assignment pattern: " + current_token.value + 
+                  " + " + nextToken.value + ", calling assignment()";
+        debugPrint(message);
         assignment();
     }
     else if (current_token.value == "if") {
-        cout << "[DEBUG] Found 'if', calling conditional()" << endl;
+        debugPrint("[DEBUG] Found 'if', calling conditional()");
         conditional();
     } else if (current_token.value == "for") {
-        cout << "[DEBUG] Found 'for', calling forLoop()" << endl;
+        debugPrint("[DEBUG] Found 'for', calling forLoop()");
         forLoop();
     } else if (current_token.value == "while") {
-        cout << "[DEBUG] Found 'while', calling whileLoop()" << endl;
+        debugPrint("[DEBUG] Found 'while', calling whileLoop()");
         whileLoop();
     } else if (current_token.value == "read") {
-        cout << "[DEBUG] Found 'read', calling readStatement()" << endl;
+        debugPrint("[DEBUG] Found 'read', calling readStatement()");
         readStatement();
     } else if (current_token.value == "write") {
-        cout << "[DEBUG] Found 'write', calling writeStatement()" << endl;
+        debugPrint("[DEBUG] Found 'write', calling writeStatement()");
         writeStatement();
     } else if (current_token.value == "(*" || current_token.value == "{") {
-        cout << "[DEBUG] Found comment, calling comment()" << endl;
+        debugPrint("[DEBUG] Found comment, calling comment()");
         comment();
     } else {
         // Простое выражение (может быть допустимо в некоторых контекстах)
-        cout << "[DEBUG] Calling expression() as fallback" << endl;
+        debugPrint("[DEBUG] Calling expression() as fallback");
         expression();
     }
     
     if (hasError) {
-        cout << "[DEBUG] Error in statement(): " << errorMessage 
-             << " at line " << errorLine << ", column " << errorColumn << endl;
+        message = "[DEBUG] Error in statement(): " + errorMessage +
+                  " at line " + to_string(errorLine) + ", column " + to_string(errorColumn);
+        debugPrint(message);
         return;
     }
     
-    cout << "[DEBUG] statement() completed, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] statement() completed, current token: " + current_token.value);
 }
 
 /**
@@ -683,30 +697,30 @@ void SyntacticAnalyzer::statement() {
  */
 void SyntacticAnalyzer::program() {
     usedRules.push_back("P5");
-    cout << "[DEBUG] program() called, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] program() called, current token: " + current_token.value);
     
     // Обработка последовательности описаний и операторов
     while (current_token.type != END_OF_FILE && current_token.value != "end") {
         // Пропускаем переводы строк между операторами
         while (matchTokenValue("\n")) {
-            cout << "[DEBUG] Skipping newline" << endl;
+            debugPrint("[DEBUG] Skipping newline");
         }
         
         // Если после пропуска переводов строк мы нашли 'end', выходим
         if (current_token.value == "end") break;
         
         // Разбор очередного оператора или описания
-        cout << "[DEBUG] Before statement(), current token: " << current_token.value << endl;
+        debugPrint("[DEBUG] Before statement(), current token: " + current_token.value);
         statement();
         
         if (hasError) {
-            cout << "[DEBUG] Program stopped due to error" << endl;
+            debugPrint("[DEBUG] Program stopped due to error");
             return;
         }
         
         // Пропускаем возможные переводы строк после оператора
         while (matchTokenValue("\n")) {
-            cout << "[DEBUG] Skipping newline after statement" << endl;
+            debugPrint("[DEBUG] Skipping newline after statement");
         }
         
         // Проверяем, не конец ли программы
@@ -722,8 +736,8 @@ void SyntacticAnalyzer::program() {
         return;
     }
     
-    cout << "[DEBUG] Found 'end' at end of program" << endl;
-    cout << "[DEBUG] program() completed, current token: " << current_token.value << endl;
+    debugPrint("[DEBUG] Found 'end' at end of program");
+    debugPrint("[DEBUG] program() completed, current token: " + current_token.value);
 }
 
 void SyntacticAnalyzer::analyze() {

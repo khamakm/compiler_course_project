@@ -17,6 +17,9 @@ private:
     string errorMessage;
     int errorLine;
     int errorColumn;
+    
+    // Флаг для отладочного вывода
+    static bool debugMode;
 
     // === Вспомогательные методы ===
     void updateCurrentToken();
@@ -28,6 +31,9 @@ private:
     bool isRelationalOperator();
     bool isAdditiveOperator();
     bool isMultiplicativeOperator();
+    
+    // Вспомогательный метод для отладочного вывода
+    void debugPrint(const string& message);
 
     // === Новая грамматика выражений (P16-P25) ===
     /**
@@ -101,7 +107,7 @@ private:
     void conditional();
     
     /**
-     * @brief P11: Цикл for - for <присваивания> to <выражение> [step <выражение>] <оператор> next
+     * @brief P11: Цикл for - for <присваивания> to <выражение> do <оператор>
      */
     void forLoop();
     
@@ -111,12 +117,12 @@ private:
     void whileLoop();
     
     /**
-     * @brief P13: Оператор ввода - readln идентификатор {, <идентификатор> }
+     * @brief P13: Оператор ввода - read(идентификатор {, <идентификатор> })
      */
     void readStatement();
     
     /**
-     * @brief P14: Оператор вывода - writeln <выражение> {, <выражение> }
+     * @brief P14: Оператор вывода - write(<выражение> {, <выражение> })
      */
     void writeStatement();
     
@@ -130,4 +136,9 @@ public:
     SyntacticAnalyzer(const vector<Token>& tokenList);
     void analyze();
     void printResult();
+    
+    // Статические методы для управления отладочным выводом
+    static void enableDebugMode() { debugMode = true; }
+    static void disableDebugMode() { debugMode = false; }
+    static bool isDebugMode() { return debugMode; }
 };
