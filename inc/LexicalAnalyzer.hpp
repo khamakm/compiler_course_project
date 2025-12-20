@@ -174,5 +174,5 @@ class LexicalAnalyzer {
     public:
         LexicalAnalyzer(string sc);
         vector<Token> getAllToken();
-        void printAllToken(vector<Token> tokens);
+        bool printAllToken(vector<Token> tokens);
 };

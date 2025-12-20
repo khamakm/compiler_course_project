@@ -199,7 +199,7 @@ vector<Token> LexicalAnalyzer::getAllToken() {
 }
 
 // Вывод в консоль таблицы ликсем
-void LexicalAnalyzer::printAllToken(vector<Token> tokens) {
+bool LexicalAnalyzer::printAllToken(vector<Token> tokens) {
     cout << "+========================================================+" << endl;
     cout << "| Таблица ликсем |" << endl;
     cout << "+========================================================+" << endl;
@@ -228,5 +228,10 @@ void LexicalAnalyzer::printAllToken(vector<Token> tokens) {
     cout << left << "| Количество ликсем: " << setw(3) <<tokens.size()
         << "     | Кол-во ошибок: " << setw(3) << error_count << "        |" << endl;
     cout << "+========================================================+" << endl;
-
+    
+    if (error_count > 0) {
+        return false;
+    } else {
+        return true;
+    }
 }

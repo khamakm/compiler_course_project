@@ -791,23 +791,28 @@ void SyntacticAnalyzer::printResult() {
     } else {
         cout << "Успешно" << endl;
     }
+
     
     cout << "=========================================" << endl;
-    cout << "Сработавшие правила:" << endl;
-    
-    // Удаляем дубликаты правил для более чистого вывода
-    vector<string> uniqueRules;
-    for (const string& rule : usedRules) {
-        if (uniqueRules.empty() || uniqueRules.back() != rule) {
-            uniqueRules.push_back(rule);
+
+    if (!hasError) {
+        cout << "Сработавшие правила:" << endl;
+
+        // Удаляем дубликаты правил для более чистого вывода
+        vector<string> uniqueRules;
+        for (const string& rule : usedRules) {
+            if (uniqueRules.empty() || uniqueRules.back() != rule) {
+                uniqueRules.push_back(rule);
+            }
         }
+
+        for (size_t i = 0; i < uniqueRules.size(); ++i) {
+            if (i > 0) cout << "->";
+            cout << uniqueRules[i];
+        }
+        cout << endl;
+
+        cout << "=========================================" << endl;
     }
     
-    for (size_t i = 0; i < uniqueRules.size(); ++i) {
-        if (i > 0) cout << "->";
-        cout << uniqueRules[i];
-    }
-    cout << endl;
-    
-    cout << "=========================================" << endl;
 }
