@@ -210,17 +210,18 @@ bool LexicalAnalyzer::printAllToken(vector<Token> tokens) {
     
     int error_count = 0;
     for (Token token : tokens) {
+        if (token.type == SERVICE) continue;
         cout << left << "| " << setw(10) << token.value << " | "
                 << setw(35) << token.getTypeString() 
-                << " | ";
+                << "   ";
         if (token.type == ERROR) {
             error_count++;
-            cout << left << setw(3) << token.line << " | "
-                << setw(3) << token.column << " |" << endl;
+            cout << left << setw(3) << token.line << "   "
+                << setw(3) << token.column << "  " << endl;
         }
         else {
-            cout << "   " << " | "
-                << "   " << " |" << endl;
+            cout << "   " << "   "
+                << "   " << "  " << endl;
         }
     }
 

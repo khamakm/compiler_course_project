@@ -5,7 +5,7 @@
 bool SyntacticAnalyzer::debugMode = false;
 
 SyntacticAnalyzer::SyntacticAnalyzer(const vector<Token>& tokenList) 
-    : tokens(tokenList), currentPos(0), hasError(false) {
+    : tokens(tokenList), currentPos(0), has_error(false) {
     if (!tokens.empty()) {
         current_token = tokens[0];
     } else {
@@ -96,7 +96,7 @@ void SyntacticAnalyzer::booleanConstant() {
         debugPrint("[DEBUG] Consuming boolean constant: " + current_token.value);
         consumeToken();
     } else {
-        hasError = true;
+        has_error = true;
         errorMessage = "Ожидается логическая константа (true или false)";
         errorLine = current_token.line;
         errorColumn = current_token.column;
@@ -117,7 +117,7 @@ void SyntacticAnalyzer::number() {
         debugPrint("[DEBUG] Consuming number: " + current_token.value);
         consumeToken();
     } else {
-        hasError = true;
+        has_error = true;
         errorMessage = "Ожидается число";
         errorLine = current_token.line;
         errorColumn = current_token.column;
@@ -137,7 +137,7 @@ void SyntacticAnalyzer::unaryOperation() {
         debugPrint("[DEBUG] Found unary operator: ~");
         consumeToken();
     } else {
-        hasError = true;
+        has_error = true;
         errorMessage = "Ожидается унарный оператор ~";
         errorLine = current_token.line;
         errorColumn = current_token.column;
@@ -166,7 +166,7 @@ void SyntacticAnalyzer::factor() {
         consumeToken();
         expression();
         if (!matchTokenValue(")")) {
-            hasError = true;
+            has_error = true;
             errorMessage = "Ожидается ')'";
             errorLine = current_token.line;
             errorColumn = current_token.column;
@@ -189,7 +189,7 @@ void SyntacticAnalyzer::factor() {
     }
     // Ошибка
     else {
-        hasError = true;
+        has_error = true;
         errorMessage = "Ожидается множитель (идентификатор, число, логическая константа или '(')";
         errorLine = current_token.line;
         errorColumn = current_token.column;
@@ -208,7 +208,7 @@ void SyntacticAnalyzer::term() {
     
     factor();
     
-    if (hasError) return;
+    if (has_error) return;
     
     // Обработка операторов умножения (P3)
     while (isMultiplicativeOperator()) {
@@ -218,7 +218,7 @@ void SyntacticAnalyzer::term() {
         consumeToken();
         factor();
         
-        if (hasError) return;
+        if (has_error) return;
     }
     
     debugPrint("[DEBUG] term() completed, current token: " + current_token.value);
@@ -233,7 +233,7 @@ void SyntacticAnalyzer::operand() {
     
     term();
     
-    if (hasError) return;
+    if (has_error) return;
     
     // Обработка операторов сложения (P2)
     while (isAdditiveOperator()) {
@@ -243,7 +243,7 @@ void SyntacticAnalyzer::operand() {
         consumeToken();
         term();
         
-        if (hasError) return;
+        if (has_error) return;
     }
     
     debugPrint("[DEBUG] operand() completed, current token: " + current_token.value);
@@ -260,7 +260,7 @@ void SyntacticAnalyzer::expression() {
     
     operand();
     
-    if (hasError) return;
+    if (has_error) return;
     
     // Обработка операторов отношения (P1)
     while (isRelationalOperator()) {
@@ -270,7 +270,7 @@ void SyntacticAnalyzer::expression() {
         consumeToken();
         operand();
         
-        if (hasError) return;
+        if (has_error) return;
     }
     
     debugPrint("[DEBUG] expression() completed, current token: " + current_token.value);
@@ -286,7 +286,7 @@ void SyntacticAnalyzer::description() {
     debugPrint("[DEBUG] description() called, current token: " + current_token.value);
     
     if (!matchTokenValue("dim")) {
-        hasError = true;
+        has_error = true;
         errorMessage = "Ожидается 'dim'";
         errorLine = current_token.line;
         errorColumn = current_token.column;
@@ -294,7 +294,7 @@ void SyntacticAnalyzer::description() {
     }
     
     if (!matchTokenType(IDENTIFIER)) {
-        hasError = true;
+        has_error = true;
         errorMessage = "Ожидается идентификатор после 'dim'";
         errorLine = current_token.line;
         errorColumn = current_token.column;
@@ -304,7 +304,7 @@ void SyntacticAnalyzer::description() {
     // Обработка списка идентификаторов через запятую
     while (matchTokenValue(",")) {
         if (!matchTokenType(IDENTIFIER)) {
-            hasError = true;
+            has_error = true;
             errorMessage = "Ожидается идентификатор после ','";
             errorLine = current_token.line;
             errorColumn = current_token.column;
@@ -316,7 +316,7 @@ void SyntacticAnalyzer::description() {
     usedRules.push_back("P7");
     if (!matchTokenValue("integer") && !matchTokenValue("real") && 
         !matchTokenValue("boolean")) {
-        hasError = true;
+        has_error = true;
         errorMessage = "Ожидается тип (integer, real, boolean)";
         errorLine = current_token.line;
         errorColumn = current_token.column;
@@ -336,7 +336,7 @@ void SyntacticAnalyzer::assignment() {
     string identifier = current_token.value;
     
     if (!matchTokenType(IDENTIFIER)) {
-        hasError = true;
+        has_error = true;
         errorMessage = "Ожидается идентификатор перед 'ass'";
         errorLine = current_token.line;
         errorColumn = current_token.column;
@@ -346,7 +346,7 @@ void SyntacticAnalyzer::assignment() {
     debugPrint("[DEBUG] Consumed identifier: " + identifier);
     
     if (!matchTokenValue("ass")) {
-        hasError = true;
+        has_error = true;
         errorMessage = "Ожидается 'ass'";
         errorLine = current_token.line;
         errorColumn = current_token.column;
@@ -369,7 +369,7 @@ void SyntacticAnalyzer::conditional() {
     debugPrint("[DEBUG] conditional() called, current token: " + current_token.value);
     
     if (!matchTokenValue("if")) {
-        hasError = true;
+        has_error = true;
         errorMessage = "Ожидается 'if'";
         errorLine = current_token.line;
         errorColumn = current_token.column;
@@ -380,7 +380,7 @@ void SyntacticAnalyzer::conditional() {
     expression();
     
     if (!matchTokenValue("then")) {
-        hasError = true;
+        has_error = true;
         errorMessage = "Ожидается 'then'";
         errorLine = current_token.line;
         errorColumn = current_token.column;
@@ -409,7 +409,7 @@ void SyntacticAnalyzer::forLoop() {
     debugPrint("[DEBUG] forLoop() called, current token: " + current_token.value);
     
     if (!matchTokenValue("for")) {
-        hasError = true;
+        has_error = true;
         errorMessage = "Ожидается 'for'";
         errorLine = current_token.line;
         errorColumn = current_token.column;
@@ -420,7 +420,7 @@ void SyntacticAnalyzer::forLoop() {
     assignment();
     
     if (!matchTokenValue("to")) {
-        hasError = true;
+        has_error = true;
         errorMessage = "Ожидается 'to'";
         errorLine = current_token.line;
         errorColumn = current_token.column;
@@ -432,7 +432,7 @@ void SyntacticAnalyzer::forLoop() {
     
     // Ключевое слово 'do' обязательно
     if (!matchTokenValue("do")) {
-        hasError = true;
+        has_error = true;
         errorMessage = "Ожидается 'do' после выражения";
         errorLine = current_token.line;
         errorColumn = current_token.column;
@@ -453,7 +453,7 @@ void SyntacticAnalyzer::whileLoop() {
     debugPrint("[DEBUG] whileLoop() called, current token: " + current_token.value);
     
     if (!matchTokenValue("while")) {
-        hasError = true;
+        has_error = true;
         errorMessage = "Ожидается 'while'";
         errorLine = current_token.line;
         errorColumn = current_token.column;
@@ -464,7 +464,7 @@ void SyntacticAnalyzer::whileLoop() {
     expression();
     
     if (!matchTokenValue("do")) {
-        hasError = true;
+        has_error = true;
         errorMessage = "Ожидается 'do'";
         errorLine = current_token.line;
         errorColumn = current_token.column;
@@ -489,7 +489,7 @@ void SyntacticAnalyzer::readStatement() {
     int column = current_token.column;
     
     if (!matchTokenValue("read")) {
-        hasError = true;
+        has_error = true;
         errorMessage = "Ожидается 'read'";
         errorLine = line;
         errorColumn = column;
@@ -498,7 +498,7 @@ void SyntacticAnalyzer::readStatement() {
     
     // Открывающая скобка обязательна
     if (!matchTokenValue("(")) {
-        hasError = true;
+        has_error = true;
         errorMessage = "Ожидается '(' после 'read'";
         errorLine = current_token.line;
         errorColumn = current_token.column;
@@ -507,7 +507,7 @@ void SyntacticAnalyzer::readStatement() {
     
     // Первый идентификатор обязателен
     if (!matchTokenType(IDENTIFIER)) {
-        hasError = true;
+        has_error = true;
         errorMessage = "Ожидается идентификатор внутри 'read()'";
         errorLine = current_token.line;
         errorColumn = current_token.column;
@@ -517,7 +517,7 @@ void SyntacticAnalyzer::readStatement() {
     // Дополнительные идентификаторы через запятую (необязательные)
     while (matchTokenValue(",")) {
         if (!matchTokenType(IDENTIFIER)) {
-            hasError = true;
+            has_error = true;
             errorMessage = "Ожидается идентификатор после ','";
             errorLine = current_token.line;
             errorColumn = current_token.column;
@@ -527,7 +527,7 @@ void SyntacticAnalyzer::readStatement() {
     
     // Закрывающая скобка обязательна
     if (!matchTokenValue(")")) {
-        hasError = true;
+        has_error = true;
         errorMessage = "Ожидается ')' после списка идентификаторов";
         errorLine = current_token.line;
         errorColumn = current_token.column;
@@ -549,7 +549,7 @@ void SyntacticAnalyzer::writeStatement() {
     int column = current_token.column;
     
     if (!matchTokenValue("write")) {
-        hasError = true;
+        has_error = true;
         errorMessage = "Ожидается 'write'";
         errorLine = line;
         errorColumn = column;
@@ -558,7 +558,7 @@ void SyntacticAnalyzer::writeStatement() {
     
     // Открывающая скобка обязательна
     if (!matchTokenValue("(")) {
-        hasError = true;
+        has_error = true;
         errorMessage = "Ожидается '(' после 'write'";
         errorLine = current_token.line;
         errorColumn = current_token.column;
@@ -568,17 +568,17 @@ void SyntacticAnalyzer::writeStatement() {
     // Первое выражение обязательно
     expression();
     
-    if (hasError) return;
+    if (has_error) return;
     
     // Дополнительные выражения через запятую (необязательные)
     while (matchTokenValue(",")) {
         expression();
-        if (hasError) return;
+        if (has_error) return;
     }
     
     // Закрывающая скобка обязательна
     if (!matchTokenValue(")")) {
-        hasError = true;
+        has_error = true;
         errorMessage = "Ожидается ')' после списка выражений";
         errorLine = current_token.line;
         errorColumn = current_token.column;
@@ -608,7 +608,7 @@ void SyntacticAnalyzer::comment() {
         
         while (!matchTokenValue("*)")) {
             if (current_token.type == END_OF_FILE) {
-                hasError = true;
+                has_error = true;
                 errorMessage = "Не закрыт комментарий '*)'";
                 errorLine = current_token.line;
                 errorColumn = current_token.column;
@@ -623,7 +623,7 @@ void SyntacticAnalyzer::comment() {
         
         while (!matchTokenValue("}")) {
             if (current_token.type == END_OF_FILE) {
-                hasError = true;
+                has_error = true;
                 errorMessage = "Не закрыт комментарий '}'";
                 errorLine = current_token.line;
                 errorColumn = current_token.column;
@@ -633,7 +633,7 @@ void SyntacticAnalyzer::comment() {
         }
     }
     else {
-        hasError = true;
+        has_error = true;
         errorMessage = "Ожидается начало комментария '(*' или '{'";
         errorLine = current_token.line;
         errorColumn = current_token.column;
@@ -695,7 +695,7 @@ void SyntacticAnalyzer::statement() {
         expression();
     }
     
-    if (hasError) {
+    if (has_error) {
         message = "[DEBUG] Error in statement(): " + errorMessage +
                   " at line " + to_string(errorLine) + ", column " + to_string(errorColumn);
         debugPrint(message);
@@ -727,7 +727,7 @@ void SyntacticAnalyzer::program() {
         debugPrint("[DEBUG] Before statement(), current token: " + current_token.value);
         statement();
         
-        if (hasError) {
+        if (has_error) {
             debugPrint("[DEBUG] Program stopped due to error");
             return;
         }
@@ -745,7 +745,7 @@ void SyntacticAnalyzer::program() {
     
     // Проверка обязательного 'end' в конце программы
     if (!matchTokenValue("end")) {
-        hasError = true;
+        has_error = true;
         errorMessage = "Ожидается 'end' в конце программы";
         errorLine = current_token.line;
         errorColumn = current_token.column;
@@ -761,8 +761,8 @@ void SyntacticAnalyzer::analyze() {
     
     program();
     
-    if (!hasError && current_token.type != END_OF_FILE) {
-        hasError = true;
+    if (!has_error && current_token.type != END_OF_FILE) {
+        has_error = true;
         errorMessage = "Лишние токены после 'end'";
         errorLine = current_token.line;
         errorColumn = current_token.column;
@@ -775,7 +775,7 @@ void SyntacticAnalyzer::printResult() {
     cout << "\n=== РЕЗУЛЬТАТ СИНТАКСИЧЕСКОГО АНАЛИЗА ===" << endl;
     cout << "=========================================" << endl;
     
-    if (hasError) {
+    if (has_error) {
         cout << "Обнаружены синтаксические ошибки" << endl;
         cout << errorMessage << endl;
         cout << "Строка " << errorLine << ", позиция " << errorColumn << endl;
@@ -786,7 +786,7 @@ void SyntacticAnalyzer::printResult() {
     cout << "=========================================" << endl;
     cout << "Результат:" << endl;
     
-    if (hasError) {
+    if (has_error) {
         cout << "Обнаружены синтаксические ошибки!" << endl;
     } else {
         cout << "Успешно" << endl;
@@ -795,7 +795,7 @@ void SyntacticAnalyzer::printResult() {
     
     cout << "=========================================" << endl;
 
-    if (!hasError) {
+    if (!has_error) {
         cout << "Сработавшие правила:" << endl;
 
         // Удаляем дубликаты правил для более чистого вывода
@@ -814,5 +814,10 @@ void SyntacticAnalyzer::printResult() {
 
         cout << "=========================================" << endl;
     }
-    
 }
+
+// Проверка наличия ошибок
+bool SyntacticAnalyzer::hasError() {
+    return has_error;
+}
+

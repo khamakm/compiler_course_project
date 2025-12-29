@@ -13,7 +13,7 @@ private:
     int currentPos;
     Token current_token;
     vector<string> usedRules;
-    bool hasError;
+    bool has_error;
     string errorMessage;
     int errorLine;
     int errorColumn;
@@ -141,4 +141,7 @@ public:
     static void enableDebugMode() { debugMode = true; }
     static void disableDebugMode() { debugMode = false; }
     static bool isDebugMode() { return debugMode; }
+    
+    // Проверка наличия ошибок
+    bool hasError();
 };
